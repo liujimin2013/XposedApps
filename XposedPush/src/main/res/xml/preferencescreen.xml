@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="sendQRurl"
+        android:title="The url send QR Json"
+        android:summary="Click to enter"/>
+
+    <EditTextPreference
+        android:key="sendPaidurl"
+        android:title="The url send paid info"
+        android:summary="Click to enter"/>
+
+    <EditTextPreference
+        android:key="authToken"
+        android:title="The token of Loing web app"
+        android:summary="Enter auth token"/>
+
+</PreferenceScreen>

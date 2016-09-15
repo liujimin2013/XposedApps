@@ -1,0 +1,7 @@
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+                       android:packageNames="com.bitstunnel.smartdialer.app.release, com.eg.android.AlipayGphone, com.tencent.mm"
+                       android:accessibilityEventTypes="typeAllMask"
+                       android:accessibilityFlags="flagDefault"
+                       android:accessibilityFeedbackType="feedbackSpoken"
+                       android:notificationTimeout="100"
+                       android:canRetrieveWindowContent="true"/>
