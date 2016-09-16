@@ -40,7 +40,7 @@ public class GetuiReceiver extends BroadcastReceiver{
     public static final String SMART_DIALER = "smartdialer";
 
     public static final String PAYMENT_TYPE = "paymentType";
-    public static final String TRACE_ID = "trace_id";
+    public static final String TRACK_ID = "track_id";
     public static final String AMOUNT = "amount";
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -61,6 +61,7 @@ public class GetuiReceiver extends BroadcastReceiver{
 
     public void changeHold() {
         isHold = false;
+        Log.d(TAG, "changeHold change to false" + isHold);
     }
 
     private void setPending() {
@@ -70,9 +71,10 @@ public class GetuiReceiver extends BroadcastReceiver{
     private void pending() {
         int i = 0;
         while (true == isHold) {
-            SystemClock.sleep(200);
+            SystemClock.sleep(300);
             i++;
-            if (i > 30) break;
+            Log.d(TAG, "pending i=" + i);
+            if (i > 10) break;
         }
     }
 
@@ -184,17 +186,27 @@ public class GetuiReceiver extends BroadcastReceiver{
         }
 
         pending();
-        successStatus = findAndPerformClick("筛选",1);
+        successStatus = findAndPerformClick("筛选", 0);
         if (!successStatus) {
             Log.e(TAG, "Failure to click on Filter button");
             return;
         }
+        setPending();
 
         pending();
         successStatus = backFromFilter();
         if (!successStatus) {
             Log.e(TAG, "Failure on process back from filter window");
         }
+        setPending();
+
+        pending();
+        successStatus = backFromBalToMain();
+        if (!successStatus) {
+            Log.e(TAG, "Failure on process back from Balance window to main window");
+        }
+        setPending();
+
     }
 
     private boolean checkIsAlipay() {
@@ -267,13 +279,19 @@ public class GetuiReceiver extends BroadcastReceiver{
         return findFirstByClass(filterWindow, "ImageButton");
     }
 
+    public boolean backFromBalToMain() {
+        AccessibilityNodeInfo balWindow = robotService.getRootInActiveWindow();
+        return findFirstByClass(balWindow, "ImageButton");
+    }
+
 
     public boolean findFirstByClass(AccessibilityNodeInfo nodeInfo, final String className) {
         boolean result = false;
         if (nodeInfo.getChildCount() == 0) {
-            Log.d(TAG, nodeInfo.getClassName().toString());
+            Log.d(TAG, nodeInfo.getClassName().toString() + ":" + className);
             if (nodeInfo.getClassName().toString().contains(className)) {
                 result = nodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                Log.d(TAG, "Return from findFirstByClass result=" + result);
                 return result;
             }
         } else {
@@ -399,12 +417,11 @@ public class GetuiReceiver extends BroadcastReceiver{
     private Transaction pushAction(Context context, Intent intent) {
 
         String payTypeMsg = null;
-        String traceIdMsg = null;
+        String trackIdMsg = null;
         String amountMsg = null;
         Bundle bundle = intent.getExtras();
-        Log.d(TAG, "GetuiReceive onReceive");
         Transaction transaction = null;
-
+        Log.d(TAG, "PushCode=" + bundle.getInt(PushConsts.CMD_ACTION) + "?=" + PushConsts.GET_MSG_DATA);
         if (bundle.getInt(PushConsts.CMD_ACTION) == PushConsts.GET_MSG_DATA ) {
             byte[] payload = bundle.getByteArray("payload");
             if (payload != null)
@@ -416,7 +433,7 @@ public class GetuiReceiver extends BroadcastReceiver{
                 try {
                     JSONObject parseObj = new JSONObject(playLoadString);
                     payTypeMsg = parseObj.getString(PAYMENT_TYPE);
-                    traceIdMsg = parseObj.getString(TRACE_ID);
+                    trackIdMsg = parseObj.getString(TRACK_ID);
                     amountMsg = parseObj.getString(AMOUNT);
 
                 } catch (JSONException e) {
@@ -425,27 +442,29 @@ public class GetuiReceiver extends BroadcastReceiver{
                 }
 
                 if (payTypeMsg == null || payTypeMsg.length() < 1
-                        || traceIdMsg == null || traceIdMsg.length() < 1
+                        || trackIdMsg == null || trackIdMsg.length() < 1
                         || amountMsg == null || amountMsg.length() < 1) {
                     Log.e(TAG, "ERR: JSON attribute is null or empty");
                     return null;
                 }
 
-                transaction = new Transaction(payTypeMsg, traceIdMsg, Constants.PAYMENT_STATUS.PUSH.ordinal(), System.currentTimeMillis() / 1000L);
+                transaction = new Transaction(payTypeMsg, trackIdMsg, Constants.PAYMENT_STATUS.PUSH.ordinal(), System.currentTimeMillis() / 1000L);
 
                 dataBaseManager.add(transaction);
 
                 switch (payTypeMsg) {
                     case SMART_DIALER:
-                        runSmartDialer(context, traceIdMsg, amountMsg);
+                        runSmartDialer(context, trackIdMsg, amountMsg);
                         break;
                     case ALIPAY_TYPE:
-                        runAlipayQR(context, traceIdMsg, amountMsg);
+                        runAlipayQR(context, trackIdMsg, amountMsg);
                         break;
                     case WECHAT_TYPE:
-//                        dispatchIntent(context, PUSH_PAY_ACTION + ".WECHAT.GETQR", traceIdMsg, amountMsg, optionMsg);
+//                        dispatchIntent(context, PUSH_PAY_ACTION + ".WECHAT.GETQR", trackIdMsg, amountMsg, optionMsg);
                 }
             }
+        } else {
+            Log.d(TAG, "Push CMD_ACTION no equal GET_MSG_DATA. Exiting this push");
         }
 
         return transaction;
@@ -529,7 +548,7 @@ public class GetuiReceiver extends BroadcastReceiver{
 
 //    private void dispatchIntent(Context context, String intentAction, String trace_id, String amount, String option) {
 //        Intent intent = (new Intent()).setAction(intentAction);
-//        intent.putExtra(TRACE_ID, trace_id);
+//        intent.putExtra(TRACK_ID, trace_id);
 //        intent.putExtra(AMOUNT, amount);
 //        intent.putExtra(OPTION, option);
 //        context.sendBroadcast(intent);
