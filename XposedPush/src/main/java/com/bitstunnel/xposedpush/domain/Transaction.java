@@ -8,8 +8,10 @@ public class Transaction {
 
     private String paymentType;
     private String track_no;
-    private String batch_no;
-    private String token;
+//    private String batch_no;
+//    private String token;
+    private String qr_string;
+    private String amount;
     private Integer status;
     private long updateTime;
 
@@ -38,21 +40,37 @@ public class Transaction {
         this.track_no = track_no;
     }
 
-    public String getBatch_no() {
-        return batch_no;
+    public String getQr_string() {
+        return qr_string;
     }
 
-    public void setBatch_no(String batch_no) {
-        this.batch_no = batch_no;
+    public void setQr_string(String qr_string) {
+        this.qr_string = qr_string;
     }
 
-    public String getToken() {
-        return token;
+    public String getAmount() {
+        return amount;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
+
+    //    public String getBatch_no() {
+//        return batch_no;
+//    }
+//
+//    public void setBatch_no(String batch_no) {
+//        this.batch_no = batch_no;
+//    }
+//
+//    public String getToken() {
+//        return token;
+//    }
+//
+//    public void setToken(String token) {
+//        this.token = token;
+//    }
 
     public Integer getStatus() {
         return status;

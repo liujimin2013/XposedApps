@@ -2,6 +2,6 @@
     <string name="app_name">XposedPush</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="start_hint">Just start push service</string>
+    <string name="start_hint">Start push service</string>
     <string name="action_settings">Settings</string>
 </resources>

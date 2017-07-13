@@ -34,12 +34,10 @@
                 android:name="PUSH_APPID"
                 android:value="${GETUI_APP_ID}" />
                 <!--android:value="2mfmZrRFkp93ax9VcdqUA5" />-->
-
         <meta-data
                 android:name="PUSH_APPKEY"
                 android:value="${GETUI_APP_KEY}" />
                 <!--android:value="EZUWLUs0DEALHMfu0Lozn4" />-->
-
         <meta-data
                 android:name="PUSH_APPSECRET"
                 android:value="${GETUI_APP_SECRET}" />

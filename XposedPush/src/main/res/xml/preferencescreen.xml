@@ -13,7 +13,7 @@
 
     <EditTextPreference
         android:key="authToken"
-        android:title="The token of Loing web app"
+        android:title="The token of Login web app"
         android:summary="Enter auth token"/>
 
 </PreferenceScreen>

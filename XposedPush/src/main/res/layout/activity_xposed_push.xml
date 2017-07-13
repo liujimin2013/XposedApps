@@ -14,6 +14,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:id="@+id/btn_list_db"
+            android:text="Display DB"/>
 
-
+    <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:name="com.bitstunnel.xposedpush.PreFragment"
+              android:id="@+id/xpreference"/>
 </LinearLayout>

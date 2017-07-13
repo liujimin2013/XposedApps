@@ -1,15 +1,13 @@
 package com.bitstunnel.xposedpush;
 
 import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.AccessibilityServiceInfo;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
+import com.bitstunnel.xposedpush.utils.Constants;
 
 import java.util.List;
 
@@ -31,13 +29,17 @@ public class RobotService extends AccessibilityService{
         super.onServiceConnected();
         getuiReceiver = new GetuiReceiver();
         getuiReceiver.setService(this);
+        Log.d(TAG, "start setting DataBaseManager");
         getuiReceiver.setDbManager(new DataBaseManager(this));
+
         Log.d(TAG, "RobotService onCreated AND set DBManager");
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.PUSH_ACTION);
-        filter.addAction(Constants.POST_QR_ACTION);
-        filter.addAction(Constants.POST_PAID_ACTION);
+        filter.addAction(Constants.NOTIFY_QRURL);
+        filter.addAction("com.bitstunnel.xposedPush.action.typeInput");
+        filter.addAction(Constants.AFTER_PAID_ACTION);
+        filter.addAction("com.bitstunnel.alipay.action.postPaidList");
 
         registerReceiver(getuiReceiver, filter);
 
@@ -58,30 +60,21 @@ public class RobotService extends AccessibilityService{
         super.onDestroy();
     }
 
-
     @Override
     public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
-        if (accessibilityEvent.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            Log.d(TAG, "TYPE_WINDOWS_STATE_CHANGE");
-            getuiReceiver.changeHold();
-            return;
-        }
 
         if (accessibilityEvent.getEventType() == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
             List<CharSequence> textList = accessibilityEvent.getText();
             if (textList != null && textList.size() > 0) {
 
-                if (textList.get(0).toString().contains("你发起的活动收款") && textList.get(0).toString().contains("钱收齐啦")) {
+                if (textList.get(0).toString().contains("通过扫码向你付款")) {
                     // alipay collection
-                    Intent intent = new Intent(Constants.POST_PAID_ACTION);
+                    Intent intent = new Intent(Constants.AFTER_PAID_ACTION);
                     // 暂时不考虑webchat 情况.
 
                     sendBroadcast(intent);
                     Log.d(TAG, "Successfully collect money event and broadcast");
                 }
-//                for (int i = 0; i < text.size() ; i++) {
-//                    Log.d(TAG, "Notification Text=" + text.get(i).toString());
-//                }
             }
         }
     }
