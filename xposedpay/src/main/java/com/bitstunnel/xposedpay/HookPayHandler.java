@@ -12,14 +12,17 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
  */
 public class HookPayHandler implements IXposedHookLoadPackage {
 
+    AlipayHook alipayHook = new AlipayHook();
+
     @Override
          public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
 
-        XposedBridge.log("Loaded App: " + lpparam.packageName);
+//        XposedBridge.log("Loaded App: " + lpparam.packageName);
 
         if (lpparam.packageName.equalsIgnoreCase(Constants.ALIPAY_PACKAGENAME)) {
 
-            new AlipayHook().hook(lpparam.classLoader);
+            alipayHook.hook(lpparam.classLoader);
+//            new AlipayHook().hook(lpparam.classLoader);
 
         }
     }
